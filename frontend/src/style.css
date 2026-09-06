@@ -1,0 +1,938 @@
+/* =========================================================
+   AI Voice Bot — Theme matching portfolio
+   https://rahulgupta012.github.io/new_portfolio_prototype/
+
+   Palette: warm cream paper bg · ink text · acid yellow accent
+   Fonts: Manrope (sans) · Playfair Display (serif/italic) · DM Mono
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. Design Tokens (exact portfolio palette)
+   --------------------------------------------------------- */
+:root {
+    --ink:    #171614;
+    --paper:  #f4f1ea;
+    --paper2: #efece5;
+    --paper3: #e8e4db;
+
+    --acid:   #d7f45a;   /* portfolio accent — yellow-green */
+    --orange: #ff7654;   /* portfolio secondary */
+    --blue:   #96b6ff;   /* portfolio tertiary */
+
+    --ink-40: rgba(23,22,20,0.40);
+    --ink-12: rgba(23,22,20,0.12);
+    --ink-06: rgba(23,22,20,0.06);
+    --ink-04: rgba(23,22,20,0.04);
+
+    /* Orb state accent colours — will be overridden per-state */
+    --orb-color-rgb: 215,244,90;  /* acid default */
+    --orb-color: rgb(var(--orb-color-rgb));
+
+    /* Typography */
+    --mono:  'DM Mono', monospace;
+    --sans:  'Manrope', sans-serif;
+    --serif: 'Playfair Display', serif;
+
+    /* Orb */
+    --orb-size: 220px;
+
+    /* Timing */
+    --t-fast: 150ms;
+    --t-mid:  350ms;
+    --t-slow: 700ms;
+    --ease:   cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Layout */
+    --radius-sm:  10px;
+    --radius-md:  16px;
+    --radius-lg:  24px;
+    --radius-pill:100px;
+}
+
+/* ---------------------------------------------------------
+   2. Reset & Base
+   --------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------
+   3. Noise texture overlay (exact copy from portfolio)
+   --------------------------------------------------------- */
+.noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------
+   4. Cursor glow (acid green, same as portfolio)
+   --------------------------------------------------------- */
+.cursor-glow {
+    position: fixed;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(215,244,90,0.18), transparent 65%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    mix-blend-mode: multiply;
+    transition: left 0.06s linear, top 0.06s linear;
+}
+
+/* ---------------------------------------------------------
+   5. Layout
+   --------------------------------------------------------- */
+#root { position: relative; z-index: 1; }
+
+.voice-app {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Orbit rings (editorial circles from portfolio) */
+.bg-orbit {
+    position: fixed;
+    border: 1px solid var(--ink-12);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bg-orbit-1 {
+    width: 55vw;
+    height: 55vw;
+    right: -14vw;
+    top: 6vh;
+    animation: orbitSpin 18s linear infinite;
+}
+
+.bg-orbit-2 {
+    width: 32vw;
+    height: 32vw;
+    right: 0;
+    top: 18vh;
+    border-style: dashed;
+    animation: orbitSpin 12s linear reverse infinite;
+}
+
+.bg-orbit-3 {
+    width: 70vw;
+    height: 70vw;
+    left: -30vw;
+    bottom: -20vw;
+    opacity: 0.5;
+    animation: orbitSpin 24s linear infinite;
+}
+
+@keyframes orbitSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* Soft background blobs matching portfolio's hero */
+.bg-blob-1 {
+    position: fixed;
+    width: 22vw;
+    height: 22vw;
+    right: 10vw;
+    top: 9vh;
+    border-radius: 50%;
+    background: rgba(186,202,255,0.55);
+    filter: blur(28px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+    animation: blobPulse 8s ease-in-out infinite;
+}
+
+.bg-blob-2 {
+    position: fixed;
+    width: 18vw;
+    height: 18vw;
+    left: 5vw;
+    bottom: 15vh;
+    border-radius: 50%;
+    background: rgba(215,244,90,0.25);
+    filter: blur(36px);
+    pointer-events: none;
+    z-index: 0;
+    animation: blobPulse 11s ease-in-out infinite reverse;
+}
+
+@keyframes blobPulse {
+    0%,100% { transform: scale(1); opacity: 0.7; }
+    50%      { transform: scale(1.15); opacity: 0.5; }
+}
+
+/* ---------------------------------------------------------
+   6. Header
+   --------------------------------------------------------- */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;  /* no logo — right-aligned actions only */
+    padding: 28px 4vw;
+    position: relative;
+    z-index: 10;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Voice pill toggle */
+.voice-pill {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid var(--ink-40);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    background: transparent;
+}
+
+.voice-pill-btn {
+    all: unset;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    color: var(--ink-40);
+    transition: background var(--t-fast), color var(--t-fast);
+    line-height: 1;
+}
+
+.voice-pill-btn:hover { color: var(--ink); }
+
+.voice-pill-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+/* Dev toggle */
+.dev-toggle-btn {
+    all: unset;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    border: 1px solid var(--ink-40);
+    color: var(--ink-40);
+    background: transparent;
+    transition: all var(--t-fast);
+    padding-bottom: 7px;
+    border-bottom-width: 1px;
+}
+
+.dev-toggle-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+}
+
+.dev-toggle-btn.active {
+    background: var(--ink);
+    color: var(--acid);
+    border-color: var(--ink);
+}
+
+/* ---------------------------------------------------------
+   7. Main orb scene
+   --------------------------------------------------------- */
+.main-scene {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px 60px;
+    gap: 44px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------------------------------------------------------
+   8. Orb
+   --------------------------------------------------------- */
+.orb-container {
+    position: relative;
+    width: var(--orb-size);
+    height: var(--orb-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Outer glow halo */
+.orb-glow {
+    position: absolute;
+    inset: -50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--orb-color) 0%, transparent 68%);
+    opacity: 0.18;
+    filter: blur(24px);
+    transition: background 0.7s var(--ease), opacity 0.7s;
+    mix-blend-mode: multiply;
+}
+
+/* Rings — editorial circles */
+.orb-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid;
+    border-color: rgba(23,22,20, 0.12);
+    opacity: 0;
+    pointer-events: none;
+    animation: ringExpand 3.5s ease-out infinite;
+}
+
+.orb-ring:nth-child(1) { inset: -18px; animation-delay: 0s; }
+.orb-ring:nth-child(2) { inset: -44px; animation-delay: 1.1s; }
+.orb-ring:nth-child(3) { inset: -70px; animation-delay: 2.2s; }
+
+@keyframes ringExpand {
+    0%   { opacity: 0; transform: scale(0.88); }
+    18%  { opacity: 0.55; }
+    100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* Canvas visualizer */
+#orb-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+/* Orb core — paper-toned sphere */
+.orb-core {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 38% 32%,
+        #ffffff 0%,
+        #f0ede6 40%,
+        #e0dbd2 75%,
+        #ccc8bf 100%
+    );
+    border: 1px solid rgba(23,22,20,0.10);
+    box-shadow:
+        0 8px 40px rgba(23,22,20,0.12),
+        0 2px 8px  rgba(23,22,20,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+    transition: box-shadow 0.7s var(--ease);
+    overflow: hidden;
+}
+
+/* Specular highlight */
+.orb-core::before {
+    content: "";
+    position: absolute;
+    width: 42%;
+    height: 28%;
+    top: 13%;
+    left: 19%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.75), transparent 80%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Acid accent inner flush — state-driven colour wash */
+.orb-core::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 60% 65%, rgba(var(--orb-color-rgb),0.25) 0%, transparent 65%);
+    transition: background 0.7s var(--ease);
+}
+
+/* ---------------------------------------------------------
+   9. Orb state colours (sets --orb-color-rgb per state)
+   --------------------------------------------------------- */
+/* IDLE — acid yellow */
+.orb-container[data-state="idle"]         { --orb-color-rgb: 215,244,90;  }
+/* CONNECTING — orange */
+.orb-container[data-state="connecting"]   { --orb-color-rgb: 255,118,84;  }
+/* LISTENING — blue */
+.orb-container[data-state="listening"]    { --orb-color-rgb: 150,182,255; }
+/* THINKING — soft purple */
+.orb-container[data-state="thinking"]     { --orb-color-rgb: 180,160,240; }
+/* SPEAKING — acid yellow (active) */
+.orb-container[data-state="speaking"]     { --orb-color-rgb: 215,244,90;  }
+/* ERROR — orange-red */
+.orb-container[data-state="error"]        { --orb-color-rgb: 255,118,84;  }
+/* RECONNECTING — orange */
+.orb-container[data-state="reconnecting"] { --orb-color-rgb: 255,118,84;  }
+
+/* ---------------------------------------------------------
+   10. Orb animation per state
+   --------------------------------------------------------- */
+
+/* IDLE — slow editorial float */
+.orb--idle .orb-core {
+    animation: idleFloat 6s ease-in-out infinite;
+}
+
+@keyframes idleFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%       { transform: translateY(-6px) scale(1.015); }
+}
+
+/* CONNECTING — ring chase */
+.orb--connecting .orb-ring {
+    animation-duration: 1.4s;
+    border-color: rgba(255,118,84,0.4);
+}
+
+.orb--connecting .orb-core {
+    animation: connectFlicker 1.6s ease-in-out infinite;
+}
+
+@keyframes connectFlicker {
+    0%, 100% { box-shadow: 0 8px 40px rgba(23,22,20,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
+    50%       { box-shadow: 0 8px 48px rgba(255,118,84,0.22), inset 0 1px 0 rgba(255,255,255,0.8); }
+}
+
+/* LISTENING — quick resonant beat */
+.orb--listening .orb-core {
+    animation: listenBeat 1s ease-in-out infinite;
+}
+
+.orb--listening .orb-ring {
+    animation-duration: 1.8s;
+    border-color: rgba(150,182,255,0.45);
+}
+
+@keyframes listenBeat {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.03); }
+}
+
+/* THINKING — subtle hue drift + dashed ring */
+.orb--thinking .orb-core {
+    animation: thinkDrift 2.2s ease-in-out infinite;
+}
+
+.orb--thinking .orb-ring {
+    border-style: dashed;
+    border-color: rgba(180,160,240,0.40);
+    animation-duration: 3s;
+}
+
+@keyframes thinkDrift {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50%       { transform: rotate(1deg) scale(1.02); }
+}
+
+/* SPEAKING — energetic pulse */
+.orb--speaking .orb-core {
+    animation: speakPulse 0.6s ease-in-out infinite;
+}
+
+.orb--speaking .orb-ring {
+    animation-duration: 1s;
+    border-color: rgba(215,244,90,0.5);
+}
+
+@keyframes speakPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.05);
+                box-shadow: 0 12px 52px rgba(215,244,90,0.3), 0 2px 8px rgba(23,22,20,0.1),
+                            inset 0 1px 0 rgba(255,255,255,0.8); }
+}
+
+/* ERROR — shake */
+.orb--error .orb-core {
+    animation: errShake 0.45s ease-in-out 1 forwards, errGlow 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes errShake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-7px); }
+    40%     { transform: translateX(7px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+}
+
+@keyframes errGlow {
+    0%,100% { box-shadow: 0 8px 40px rgba(23,22,20,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
+    50%     { box-shadow: 0 8px 48px rgba(255,118,84,0.3), inset 0 1px 0 rgba(255,255,255,0.8); }
+}
+
+/* RECONNECTING */
+.orb--reconnecting .orb-core {
+    animation: reconnectFade 2s ease-in-out infinite;
+}
+
+@keyframes reconnectFade {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%     { opacity: 0.7; transform: scale(0.97); }
+}
+
+/* ---------------------------------------------------------
+   11. State label + connection indicator
+   --------------------------------------------------------- */
+.state-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.state-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+    min-height: 18px;
+    transition: color var(--t-mid), opacity var(--t-mid);
+}
+
+.state-label.prominent {
+    color: var(--ink);
+}
+
+/* ✦ asterisk spin — editorial touch from portfolio */
+.state-asterisk {
+    display: inline-block;
+    color: var(--acid);
+    animation: astSpin 4s linear infinite;
+    margin-left: 6px;
+    font-size: 14px;
+    vertical-align: middle;
+    opacity: 0;
+    transition: opacity var(--t-mid);
+}
+
+.prominent .state-asterisk { opacity: 1; }
+
+@keyframes astSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+    transition: color var(--t-mid);
+}
+
+.conn-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-40);
+    transition: background var(--t-mid), box-shadow var(--t-mid);
+    flex-shrink: 0;
+}
+
+.conn-dot.dot--connected {
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.2);
+    animation: dotBlink 2.5s ease-in-out infinite;
+}
+
+.conn-dot.dot--connecting {
+    background: var(--orange);
+    animation: dotBlink 0.8s ease-in-out infinite;
+}
+
+.conn-dot.dot--error {
+    background: var(--orange);
+}
+
+@keyframes dotBlink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+}
+
+/* ---------------------------------------------------------
+   12. Controls
+   --------------------------------------------------------- */
+.controls {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.ctrl-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+}
+
+.ctrl-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+}
+
+/* Base button — editorial circle style (portfolio's .round-link) */
+.ctrl-btn {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--t-mid) var(--ease),
+                color var(--t-mid),
+                border-color var(--t-mid),
+                transform 0.35s var(--ease),
+                box-shadow var(--t-mid);
+    position: relative;
+    overflow: hidden;
+}
+
+.ctrl-btn:active { transform: scale(0.93) !important; }
+
+/* Sizes */
+.ctrl-btn--lg {
+    width: 72px;
+    height: 72px;
+    font-size: 22px;
+}
+
+.ctrl-btn--md {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+}
+
+/* CONNECT — ink fill, acid hover */
+.ctrl-btn--connect {
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+}
+
+.ctrl-btn--connect:hover {
+    background: var(--acid);
+    color: var(--ink);
+    border-color: var(--acid);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(23,22,20,0.18);
+}
+
+/* END — orange tint */
+.ctrl-btn--end {
+    background: transparent;
+    color: var(--orange);
+    border: 1px solid rgba(255,118,84, 0.5);
+}
+
+.ctrl-btn--end:hover {
+    background: var(--orange);
+    color: var(--paper);
+    border-color: var(--orange);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(255,118,84,0.25);
+}
+
+/* MIC — ink border */
+.ctrl-btn--mic {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink-40);
+}
+
+.ctrl-btn--mic:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+    transform: translateY(-3px) rotate(360deg);
+    box-shadow: 0 8px 24px rgba(23,22,20,0.15);
+}
+
+.ctrl-btn--mic.muted {
+    color: var(--orange);
+    border-color: rgba(255,118,84,0.5);
+    background: rgba(255,118,84,0.06);
+}
+
+.ctrl-btn:disabled {
+    opacity: 0.28;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   13. Developer Dashboard
+   --------------------------------------------------------- */
+.dev-dashboard {
+    border-top: 1px solid var(--ink-12);
+    background: var(--paper2);
+    padding: 36px 7vw 48px;
+    display: none;
+    flex-direction: column;
+    gap: 32px;
+    position: relative;
+    z-index: 1;
+}
+
+.dev-dashboard.visible { display: flex; }
+
+.dev-section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dev-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--ink-12);
+}
+
+/* Metrics grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.metric-card {
+    background: var(--paper);
+    border: 1px solid var(--ink-12);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: border-color var(--t-mid), box-shadow var(--t-mid);
+}
+
+.metric-card:hover {
+    border-color: var(--ink-40);
+    box-shadow: 0 4px 16px rgba(23,22,20,0.08);
+}
+
+.metric-card-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+}
+
+.metric-card-value {
+    font-family: var(--sans);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    transition: color var(--t-mid);
+}
+
+.metric-card-unit {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-40);
+}
+
+.metric-card-bar {
+    height: 2px;
+    background: var(--ink-12);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.metric-card-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--ink);
+    width: 0%;
+    transition: width 0.7s var(--ease);
+}
+
+/* Pipeline visualization */
+.pipeline-viz {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 4px 0 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-12) transparent;
+}
+
+.pipeline-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pipeline-node-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: var(--paper);
+    border: 1px solid var(--ink-12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: border-color var(--t-mid), box-shadow var(--t-mid), background var(--t-mid);
+}
+
+.pipeline-node.active .pipeline-node-icon {
+    border-color: var(--ink);
+    background: var(--ink);
+    box-shadow: 0 4px 14px rgba(23,22,20,0.18);
+}
+
+.pipeline-node.active .pipeline-node-icon span {
+    filter: invert(1); /* emoji invert trick to appear on dark bg */
+}
+
+.pipeline-node-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+    transition: color var(--t-mid);
+}
+
+.pipeline-node.active .pipeline-node-label { color: var(--ink); }
+
+.pipeline-connector {
+    flex: 1;
+    min-width: 20px;
+    max-width: 64px;
+    height: 1px;
+    background: var(--ink-12);
+    position: relative;
+    margin-bottom: 26px;
+    overflow: hidden;
+}
+
+.pipeline-connector-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: translateX(-100%);
+    transition: transform 0.5s var(--ease);
+}
+
+.pipeline-connector.active .pipeline-connector-fill { transform: translateX(0); }
+
+/* Events log */
+.events-log {
+    background: var(--paper);
+    border: 1px solid var(--ink-12);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-12) transparent;
+}
+
+.event-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    animation: evSlide 0.25s var(--ease) both;
+}
+
+@keyframes evSlide {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.event-time  { font-size: 9px; color: var(--ink-40); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.event-text  { color: var(--ink-40); line-height: 1.4; }
+.event-text.ev--error    { color: var(--orange); }
+.event-text.ev--speaking { color: #888; }
+.event-text.ev--listening{ color: #5a8aee; }
+.event-text.ev--info     { color: var(--ink); }
+
+/* ---------------------------------------------------------
+   14. Hidden audio
+   --------------------------------------------------------- */
+audio { display: none; }
+
+/* ---------------------------------------------------------
+   15. Responsive
+   --------------------------------------------------------- */
+@media (max-width: 640px) {
+    :root { --orb-size: 180px; }
+    .app-header { padding: 20px 5vw; }
+    .main-scene { gap: 36px; padding-bottom: 44px; }
+    .dev-dashboard { padding: 28px 5vw 36px; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .ctrl-btn--lg { width: 64px; height: 64px; }
+    .ctrl-btn--md { width: 46px; height: 46px; }
+    .bg-orbit-1, .bg-orbit-2 { display: none; }
+}
+
+@media (max-width: 380px) {
+    :root { --orb-size: 155px; }
+    .controls { gap: 14px; }
+}
+
+/* ---------------------------------------------------------
+   16. Utility
+   --------------------------------------------------------- */
+.hidden { display: none !important; }

@@ -1,0 +1,11 @@
+# pyaudio
+# pipecat-ai[deepgram,google,piper,local,ollama]
+pipecat-ai==1.8.1
+fastapi==0.141.1
+uvicorn==0.52.4
+deepgram-sdk==7.8.0
+google-genai==2.21.0
+python-dotenv==1.2.3
+loguru==0.7.3
+aiortc==1.15.0
+google-api-core==2.34.0

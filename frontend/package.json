@@ -1,0 +1,17 @@
+{
+  "name": "pipecat-webrtc-voicebot",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@pipecat-ai/client-js": "1.13.0",
+    "@pipecat-ai/small-webrtc-transport": "1.10.6",
+    "vite": "^7.1.0"
+  },
+  "devDependencies": {}
+}
