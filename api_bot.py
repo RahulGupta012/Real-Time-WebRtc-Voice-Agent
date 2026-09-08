@@ -270,29 +270,29 @@ async def run_bot(connection: SmallWebRTCConnection, session: VoiceSession):
     # Run
     # -----------------------------------------------------
 
-    async def auto_end_call():
-        await asyncio.sleep(120)
+    # async def auto_end_call():
+    #     await asyncio.sleep(120)
 
-        logger.warning(
-            f"Maximum call duration reached | "
-            f"conversation_id={session.conversation_id}"
-        )
+    #     logger.warning(
+    #         f"Maximum call duration reached | "
+    #         f"conversation_id={session.conversation_id}"
+    #     )
 
-        await worker.cancel()
+    #     await worker.cancel()
 
-    timeout_task = asyncio.create_task(auto_end_call())
+    # timeout_task = asyncio.create_task(auto_end_call())
 
-    try:
-        runner = WorkerRunner()
+    # try:
+    #     runner = WorkerRunner()
 
-        await runner.add_workers(worker)
+    #     await runner.add_workers(worker)
 
-        await runner.run()
+    #     await runner.run()
 
-    finally:
-        timeout_task.cancel()
+    # finally:
+    #     timeout_task.cancel()
 
-        stop_session_logging(
-            session.conversation_id,
-            session_token,
-        )
+    #     stop_session_logging(
+    #         session.conversation_id,
+    #         session_token,
+    #     )
