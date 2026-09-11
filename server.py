@@ -17,6 +17,8 @@ from pipecat.transports.smallwebrtc.request_handler import (
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 
 from sessions.manager import SessionManager
+from pipecat.transports.smallwebrtc.connection import IceServer
+from pipecat.transports.smallwebrtc.request_handler import SmallWebRTCRequestHandler
 
 # from free_local_bot import run_bot
 from api_bot import run_bot
@@ -33,12 +35,49 @@ FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN")
 #session intilizing for multiple users
 session_manager = SessionManager(max_concurrent_sessions=3)
 
+class TURNWebRTCRequestHandler(SmallWebRTCRequestHandler):
+    async def handle_web_request(self, request, webrtc_connection_callback):
+        answer = await super().handle_web_request(
+            request,
+            webrtc_connection_callback,
+        )
 
+        if answer is not None:
+            answer["iceConfig"] = {
+                "iceServers": [
+                    {
+                        "urls": "stun:stun.l.google.com:19302",
+                    },
+                    {
+                        "urls": "turn:34.118.204.173:3478",
+                        "username":TURN_USERNAME,
+                        "credential": TURN_PASSWORD,
+                    },
+                ]
+            }
+
+        return answer
 # WebRTC handler
 
-small_webrtc_handler = SmallWebRTCRequestHandler()
+#small_webrtc_handler = SmallWebRTCRequestHandler()
+#small_webrtc_handler = SmallWebRTCRequestHandler(
+#    ice_servers=["stun:stun.l.google.com:19302"]
+#)
 
 
+
+small_webrtc_handler = TURNWebRTCRequestHandler(
+    ice_servers=[
+        IceServer(
+            urls="stun:stun.l.google.com:19302"
+        ),
+        IceServer(
+	    urls=f"turn:{TURN_SERVER_IP}:3478",
+            username=TURN_USERNAME,
+            credential=TURN_PASSWORD,
+        ),
+    ]
+)
 # FastAPI lifecycle
 
 @asynccontextmanager
@@ -84,7 +123,7 @@ async def health():
 
 
 # WebRTC Offer
-session_manager = SessionManager(3)
+#session_manager = SessionManager(3)
 
 
 @app.post("/api/offer")

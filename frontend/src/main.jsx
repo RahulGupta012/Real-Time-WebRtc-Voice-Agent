@@ -623,7 +623,20 @@ let client = null;
 let selectedLanguage = "en";
 
 function createClient() {
-    const transport = new SmallWebRTCTransport();
+//const transport = new SmallWebRTCTransport();
+
+	const transport = new SmallWebRTCTransport({
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302",
+        },
+        {
+            urls: "turn:34.118.204.173:3478",
+            username: "voicebot",
+            credential: "StrongTurnPassword123",
+        },
+    ],
+});
 
     client = new PipecatClient({
         transport,
