@@ -31,6 +31,10 @@ setup_logging()
 
 
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN")
+TURN_SERVER_IP = os.getenv("TURN_SERVER_IP")
+TURN_USERNAME = os.getenv("TURN_USERNAME")
+TURN_PASSWORD = os.getenv("TURN_PASSWORD")
+
 
 #session intilizing for multiple users
 session_manager = SessionManager(max_concurrent_sessions=3)
