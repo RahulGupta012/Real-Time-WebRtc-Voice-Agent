@@ -39,24 +39,24 @@ def setup_logging():
         force=True,
     )
 
+    for name in (
+         "websockets",
+         "websockets.client",
+         "websockets.server",
+         "aiortc",
+         "aioice",
+    ):
+         logging.getLogger(name).setLevel(logging.WARNING)
+
 #    for name in (
 #        "websockets",
 #        "websockets.client",
 #        "websockets.server",
-#        "aiortc",
-#        "aioice",
 #    ):
 #        logging.getLogger(name).setLevel(logging.WARNING)
 
-    for name in (
-        "websockets",
-        "websockets.client",
-        "websockets.server",
-    ):
-        logging.getLogger(name).setLevel(logging.WARNING)
-
-    for name in ("aiortc", "aioice"):
-        logging.getLogger(name).setLevel(logging.DEBUG)
+#    for name in ("aiortc", "aioice"):
+#        logging.getLogger(name).setLevel(logging.DEBUG)
 
 def start_session_logging(conversation_id: str):
 
