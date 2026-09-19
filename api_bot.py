@@ -289,7 +289,7 @@ async def run_bot(connection: SmallWebRTCConnection, session: VoiceSession):
          await runner.run()
 
     finally:
-         timeout_task.cancel()
+        #  timeout_task.cancel()
 
          stop_session_logging(
               session.conversation_id,
